@@ -221,7 +221,7 @@ def isoslice(var, iso_values, grid=None, iso_array=None, axis="Z"):
 
     # make sure iso_values are array-like
     if isinstance(iso_values, (int, float)):
-        iso_values = [iso_values]
+        iso_values = [iso_values]    #FS: when transforming into list, problems happen in grip.py/transform!!!
 
     # interpolate to the z coordinates associated with var
     if iso_array is None:

@@ -377,7 +377,7 @@ def M2(
     return var
 
 
-def mld(sig0, h, mask, z=None, thresh=0.03):
+def mld(sig0, h, mask, z=None, iso_array=False, thresh=0.03):
     """Calculate the mixed layer depth [m].
 
     Inputs
@@ -428,15 +428,26 @@ def mld(sig0, h, mask, z=None, thresh=0.03):
         z = sig0.z_rho
 
     # the mixed layer depth is the isosurface of depth where the potential density equals the surface - a threshold
-    mld = xroms.isoslice(
-        z,
-        0.0,
-        sig0.attrs["grid"],
-        iso_array=sig0 - sig0.isel(s_rho=-1) - thresh,
-        axis="Z",
-    )
-    #     mld = xroms.xisoslice(sig0 - sig0.isel(s_rho=-1) - thresh, 0.0, z, skey)
+    if not iso_array:
+        mld = xroms.isoslice(
+            z,
+            0.0,
+            sig0.attrs["grid"],
+            iso_array=sig0 - sig0.isel(s_rho=-1) - thresh,
+            axis="Z",
+        )
+        #     mld = xroms.xisoslice(sig0 - sig0.isel(s_rho=-1) - thresh, 0.0, z, skey)
+    else:
+        print('\n\nATTENTION!!! CALCULATING BASED ON THE POT. DENSITY FOR -10M!!!')
+        sig0_ref = xroms.isoslice(sig0, -10)
 
+        mld = xroms.isoslice(
+            z,
+            0.0,
+            sig0.attrs["grid"],
+            iso_array = sig0 - sig0_ref - thresh,
+            axis="Z",
+        )        
     # Replace nan's that are not masked with the depth of the water column.
     cond = (mld.isnull()) & (mask == 1)
     mld = mld.where(~cond, h)

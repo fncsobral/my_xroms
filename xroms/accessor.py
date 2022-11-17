@@ -403,7 +403,7 @@ class xromsDatasetAccessor:
             self.ds["M2"] = var
         return self.ds.M2
 
-    def mld(self, thresh=0.03):
+    def mld(self, iso_array=False, thresh=0.03):
         """Calculate mixed layer depth [m] on rho grid.
 
         Inputs
@@ -420,7 +420,7 @@ class xromsDatasetAccessor:
         >>> ds.xroms.mld(thresh=0.03).isel(ocean_time=0).plot(vmin=-20, vmax=0)
         """
 
-        return xroms.mld(self.sig0, self.ds.h, self.ds.mask_rho, thresh=thresh)
+        return xroms.mld(self.sig0, self.ds.h, self.ds.mask_rho, iso_array=iso_array, thresh=thresh)
 
     def ddxi(
         self,

@@ -11,14 +11,14 @@ import xgcm
 
 import xroms
 
-
+import xesmf as xe  #FS
 # try:
 #     import xesmf as xe
 # except ModuleNotFoundError:
 #     warnings.warn("xESMF is not installed, so `interpll` will not run.")
 
-
-def interpll(var, lons, lats, which="pairs"):
+# def interpll(var, lons, lats, which="pairs"):  #FS
+def interpll(var, lons, lats, ds_locs, varint=False, which="pairs"):
     """Interpolate var to lons/lats positions.
 
     Wraps xESMF to perform proper horizontal interpolation on non-flat Earth.
@@ -88,7 +88,11 @@ def interpll(var, lons, lats, which="pairs"):
         locstream_out = False
 
     # set up for output
-    varint = xr.Dataset({"lat": (["lat"], lats), "lon": (["lon"], lons)})
+    if varint == False:
+        print('NONE')
+        varint = xr.Dataset({"lat": (["lat"], lats), "lon": (["lon"], lons)}) #FS
+    else:
+        varint = ds_locs
 
     # Calculate weights.
     regridder = xe.Regridder(var, varint, "bilinear", locstream_out=locstream_out)
@@ -123,8 +127,8 @@ def interpll(var, lons, lats, which="pairs"):
     elif which == "grid":
         varint["lon"].attrs["axis"] = "X"
         varint["lat"].attrs["axis"] = "Y"
-    varint["lon"].attrs["standard_name"] = "longitude"
-    varint["lat"].attrs["standard_name"] = "latitude"
+        varint["lon"].attrs["standard_name"] = "longitude" # FS: +1tab
+        varint["lat"].attrs["standard_name"] = "latitude"  # FS: +1tab
 
     return varint
 
